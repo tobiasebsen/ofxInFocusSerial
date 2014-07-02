@@ -34,11 +34,11 @@ public:
     int getLampHoursNormal();
     int getLampHoursEco();
     
-    bool getLampEco();
+    bool isLampEco();
     void setLampEco(bool eco);
     
     bool isPowerOn();
-    void setPower(bool on);
+    void setPowerOn(bool on);
     
     string getFirmwareVersion();
     

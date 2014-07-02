@@ -31,7 +31,7 @@ bool ofxInFocusSerial::isPowerOn() {
     return getResponseInt() == 1;
 }
 
-void ofxInFocusSerial::setPower(bool on) {
+void ofxInFocusSerial::setPowerOn(bool on) {
     commandWrite("PWR", on ? 1 : 0);
 }
 
@@ -45,7 +45,7 @@ int ofxInFocusSerial::getLampHoursEco() {
     return getResponseInt();
 }
 
-bool ofxInFocusSerial::getLampEco() {
+bool ofxInFocusSerial::isLampEco() {
     commandRead("IPM");
     return getResponseInt() == 1;
 }
