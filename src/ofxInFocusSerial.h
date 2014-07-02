@@ -21,11 +21,10 @@
 #define INFOCUS_SYS_COOLING     12
 #define INFOCUS_SYS_ERROR       18
 
-class ofxInFocusSerial {
+class ofxInFocusSerial : public ofSerial {
 public:
-    
+
     bool setup(string portName);
-    bool isInitialized();
 
     vector<string> getPortNames();
     
@@ -55,6 +54,6 @@ protected:
     string getResponseString();
 
 private:
-    ofSerial serial;
+    //ofSerial serial;
     string response;
 };

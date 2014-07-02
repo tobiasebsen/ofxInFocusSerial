@@ -9,16 +9,21 @@
 #include "ofxInFocusSerial.h"
 
 bool ofxInFocusSerial::setup(string portName) {
-    return serial.setup(portName, 19200);
-}
+    
+    bool result = ofSerial::setup(portName, 19200);
 
-bool ofxInFocusSerial::isInitialized() {
-    return serial.isInitialized();
+    // Disable hardware flow control
+    struct termios options;
+	tcgetattr(fd, &options);
+    options.c_cflag &= ~CRTSCTS;
+    tcsetattr(fd, TCSANOW, &options);
+
+    return result;
 }
 
 vector<string> ofxInFocusSerial::getPortNames() {
     vector<string> names;
-    vector<ofSerialDeviceInfo> list = serial.getDeviceList();
+    vector<ofSerialDeviceInfo> list = ofSerial::getDeviceList();
     vector<ofSerialDeviceInfo>::iterator it = list.begin();
     for (; it!=list.end(); ++it) {
         names.push_back(it->getDeviceName());
@@ -65,12 +70,12 @@ int ofxInFocusSerial::getSystemState() {
 }
 
 void ofxInFocusSerial::write(string str) {
-    serial.writeBytes((unsigned char*)str.c_str(), str.length());
+    ofSerial::writeBytes((unsigned char*)str.c_str(), str.length());
 }
 
 string ofxInFocusSerial::read() {
     char str[64];
-    int n = serial.readBytes((unsigned char*)str, sizeof(str));
+    int n = ofSerial::readBytes((unsigned char*)str, sizeof(str));
     if (n > 0)
         str[n] = 0;
     else
@@ -80,10 +85,12 @@ string ofxInFocusSerial::read() {
 
 void ofxInFocusSerial::commandWrite(string cmd, int value) {
     write("(" + cmd + ofToString(value) + ")");
+    ofSerial::drain();
 }
 
 string ofxInFocusSerial::commandRead(string cmd) {
     write("(" + cmd + "?)");
+    ofSerial::drain();
     unsigned long long before = ofGetElapsedTimeMillis();
     response = read();
     while (response.find(")") == -1 && ofGetElapsedTimeMillis() - before < 2000) {
