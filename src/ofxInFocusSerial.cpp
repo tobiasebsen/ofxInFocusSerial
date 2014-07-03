@@ -9,12 +9,14 @@
 #include "ofxInFocusSerial.h"
 
 bool ofxInFocusSerial::setup(string portName) {
-    
+
     bool result = ofSerial::setup(portName, 19200);
 
     // Disable hardware flow control
     struct termios options;
 	tcgetattr(fd, &options);
+    options.c_iflag &= ~(IXON | IXOFF);
+    options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
     options.c_cflag &= ~CRTSCTS;
     tcsetattr(fd, TCSANOW, &options);
 
@@ -89,8 +91,11 @@ void ofxInFocusSerial::commandWrite(string cmd, int value) {
 }
 
 string ofxInFocusSerial::commandRead(string cmd) {
+
+    ofSerial::flush();
     write("(" + cmd + "?)");
     ofSerial::drain();
+
     unsigned long long before = ofGetElapsedTimeMillis();
     response = read();
     while (response.find(")") == -1 && ofGetElapsedTimeMillis() - before < 2000) {
