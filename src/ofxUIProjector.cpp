@@ -28,6 +28,12 @@ void ofxUIProjector::setup() {
     
     this->addToggle("Power", false);
     this->addToggle("Eco", false);
+    lampNormal = this->addLabel("LampHours");
+    lampNormal->setFont(this->getFontSmall());
+    lampNormal->setLabel("Lamp hours (normal): -");
+    lampEco = this->addLabel("LampHoursEco");
+    lampEco->setFont(this->getFontSmall());
+    lampEco->setLabel("Lamp hours (eco): -");
     
     this->autoSizeToFitWidgets();
     
@@ -49,6 +55,9 @@ void ofxUIProjector::threadedFunction() {
 
             ((ofxUIToggle*)this->getWidget("Power"))->setValue( serial.isPowerOn() );
             ((ofxUIToggle*)this->getWidget("Eco"))->setValue( serial.isLampEco() );
+            
+            lampNormal->setLabel("Lamp hours (normal): " + ofToString(serial.getLampHoursNormal()));
+            lampEco->setLabel("Lamp hours (eco): " + ofToString(serial.getLampHoursEco()));
         }
         ofSleepMillis(500);
     }

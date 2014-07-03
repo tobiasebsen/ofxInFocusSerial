@@ -26,4 +26,6 @@ public:
 private:
     ofxInFocusSerial serial;
     ofxUIDropDownList *ports;
+    ofxUILabel *lampNormal;
+    ofxUILabel *lampEco;
 };
