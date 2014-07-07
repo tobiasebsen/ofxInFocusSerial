@@ -10,17 +10,19 @@
 
 bool ofxInFocusSerial::setup(string portName) {
 
-    bool result = ofSerial::setup(portName, 19200);
+    bool success = ofSerial::setup(portName, 19200);
+    
+    if (success) {
 
-    // Disable hardware flow control
-    struct termios options;
-	tcgetattr(fd, &options);
-    options.c_iflag &= ~(IXON | IXOFF);
-    options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
-    options.c_cflag &= ~CRTSCTS;
-    tcsetattr(fd, TCSANOW, &options);
-
-    return result;
+        // Disable hardware flow control
+        struct termios options;
+        tcgetattr(fd, &options);
+        options.c_iflag &= ~(IXON | IXOFF);
+        options.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+        options.c_cflag &= ~CRTSCTS;
+        tcsetattr(fd, TCSANOW, &options);
+    }
+    return success;
 }
 
 vector<string> ofxInFocusSerial::getPortNames() {
@@ -72,16 +74,24 @@ int ofxInFocusSerial::getSystemState() {
 }
 
 void ofxInFocusSerial::write(string str) {
+    if (!isInitialized())
+        return;
+
     ofSerial::writeBytes((unsigned char*)str.c_str(), str.length());
 }
 
 string ofxInFocusSerial::read() {
+    
+    if (!isInitialized())
+        return "";
+    
     char str[64];
     int n = ofSerial::readBytes((unsigned char*)str, sizeof(str));
     if (n > 0)
         str[n] = 0;
     else
         str[0] = 0;
+    
     return str;
 }
 
